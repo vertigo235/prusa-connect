@@ -3,12 +3,9 @@
   import PlayIcon from '@lucide/svelte/icons/play';
   import Trash2Icon from '@lucide/svelte/icons/trash-2';
 
+  import { SlotActions } from '../../../slots';
   import { t } from '../../../i18n';
-  import {
-    ABOVE_ROW_LINK,
-    DropdownMenuItem,
-    RowActions,
-  } from '../../../primitives';
+  import { ABOVE_ROW_LINK, DropdownMenuItem } from '../../../primitives';
   import type { PrinterFileEntry, PrinterFileRowContext } from './types';
 
   let {
@@ -20,17 +17,22 @@
   } = $props();
 
   const print = $derived(row.printControl(entry));
+  const fileRef = $derived(`printer:${row.deviceId}:${entry.path}`);
 </script>
 
-{#if print !== undefined || row.canFlash(entry) || row.canDelete(entry)}
-  <RowActions name={row.nameOf(entry)} class={ABOVE_ROW_LINK}>
+<SlotActions
+  name="file-action"
+  fileRef={fileRef}
+  label={row.nameOf(entry)}
+  class={ABOVE_ROW_LINK}
+>
+  {#snippet items()}
     {#if print}
       <DropdownMenuItem
         disabled={print.disabled}
         onSelect={() => row.onPrint(entry)}
       >
         <PlayIcon aria-hidden="true" />
-        <!-- The menu is the one place on this row with the width for the. -->
         <span class="flex max-w-64 flex-col">
           <span>{t('printerDetailFiles.action.print')}</span>
           {#if print.reason}
@@ -60,5 +62,5 @@
         {t('printerDetailFiles.action.delete')}
       </DropdownMenuItem>
     {/if}
-  </RowActions>
-{/if}
+  {/snippet}
+</SlotActions>

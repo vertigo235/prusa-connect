@@ -93,6 +93,8 @@ export interface PrinterFilesPanelProps {
 
 /** What one row of the listing may ask of the panel that owns it. */
 export interface PrinterFileRowContext {
+  /** The printer that owns the file, for module file actions. */
+  deviceId: string;
   nameOf(entry: PrinterFileEntry): string;
   glyphOf(entry: PrinterFileEntry): Component;
   thumbnailOf(entry: PrinterFileEntry): string | undefined;
