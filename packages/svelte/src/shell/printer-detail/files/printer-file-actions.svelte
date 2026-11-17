@@ -17,50 +17,64 @@
   } = $props();
 
   const print = $derived(row.printControl(entry));
+  const localActions = $derived(
+    print !== undefined || row.canFlash(entry) || row.canDelete(entry),
+  );
   const fileRef = $derived(`printer:${row.deviceId}:${entry.path}`);
 </script>
 
-<SlotActions
-  name="file-action"
-  fileRef={fileRef}
-  label={row.nameOf(entry)}
-  class={ABOVE_ROW_LINK}
->
-  {#snippet items()}
-    {#if print}
-      <DropdownMenuItem
-        disabled={print.disabled}
-        onSelect={() => row.onPrint(entry)}
-      >
-        <PlayIcon aria-hidden="true" />
-        <span class="flex max-w-64 flex-col">
-          <span>{t('printerDetailFiles.action.print')}</span>
-          {#if print.reason}
-            <span class="text-xs text-muted-foreground">{print.reason}</span>
-          {/if}
-        </span>
-      </DropdownMenuItem>
-    {/if}
-    {#if row.canFlash(entry)}
-      <DropdownMenuItem
-        onSelect={() => {
-          row.onFlash(entry);
-        }}
-      >
-        <HardDriveDownloadIcon aria-hidden="true" />
-        {t('printerDetail.files.action.flash')}
-      </DropdownMenuItem>
-    {/if}
-    {#if row.canDelete(entry)}
-      <DropdownMenuItem
-        variant="destructive"
-        onSelect={() => {
-          row.onDelete(entry);
-        }}
-      >
-        <Trash2Icon aria-hidden="true" />
-        {t('printerDetailFiles.action.delete')}
-      </DropdownMenuItem>
-    {/if}
-  {/snippet}
-</SlotActions>
+{#snippet localItems()}
+  {#if print}
+    <DropdownMenuItem
+      disabled={print.disabled}
+      onSelect={() => row.onPrint(entry)}
+    >
+      <PlayIcon aria-hidden="true" />
+      <span class="flex max-w-64 flex-col">
+        <span>{t('printerDetailFiles.action.print')}</span>
+        {#if print.reason}
+          <span class="text-xs text-muted-foreground">{print.reason}</span>
+        {/if}
+      </span>
+    </DropdownMenuItem>
+  {/if}
+  {#if row.canFlash(entry)}
+    <DropdownMenuItem
+      onSelect={() => {
+        row.onFlash(entry);
+      }}
+    >
+      <HardDriveDownloadIcon aria-hidden="true" />
+      {t('printerDetail.files.action.flash')}
+    </DropdownMenuItem>
+  {/if}
+  {#if row.canDelete(entry)}
+    <DropdownMenuItem
+      variant="destructive"
+      onSelect={() => {
+        row.onDelete(entry);
+      }}
+    >
+      <Trash2Icon aria-hidden="true" />
+      {t('printerDetailFiles.action.delete')}
+    </DropdownMenuItem>
+  {/if}
+{/snippet}
+
+{#if localActions}
+  <SlotActions
+    name="file-action"
+    {fileRef}
+    label={row.nameOf(entry)}
+    class={ABOVE_ROW_LINK}
+  >
+    {#snippet items()}{@render localItems()}{/snippet}
+  </SlotActions>
+{:else}
+  <SlotActions
+    name="file-action"
+    {fileRef}
+    label={row.nameOf(entry)}
+    class={ABOVE_ROW_LINK}
+  />
+{/if}

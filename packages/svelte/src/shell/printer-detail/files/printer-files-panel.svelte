@@ -447,9 +447,8 @@
         ),
   );
 
-  const deviceId = $derived(device.id);
-  const rowContext: PrinterFileRowContext = $derived({
-    deviceId,
+  const rowContext: PrinterFileRowContext = $derived.by(() => ({
+    deviceId: device.id,
     nameOf,
     glyphOf,
     thumbnailOf: (entry) => thumbnailFor?.(entry.path),
@@ -474,7 +473,7 @@
     onDelete: (entry) => {
       pending = [entry];
     },
-  });
+  }));
 
   const deleteNote = $derived(
     pending.some((entry) => entry.folder)
